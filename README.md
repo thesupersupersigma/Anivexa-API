@@ -62,7 +62,7 @@ GET /stream/reanime/:id/sub|dub/:ep
 
 ```bash
 git clone https://github.com/walterwhite-69/Anivexa-API
-cd all-api
+cd Anivexa-API
 node server.js
 ```
 
