@@ -11,6 +11,7 @@ import {
 import { get, set, isFresh, SHOW_IDENTITY_TTL } from "../core/smartcache.js";
 
 const BASE = "https://anidb.app";
+const PROXY = "YOUR_PROXY_URL";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 async function fetchTextWithFallback(url, headers = {}) {
@@ -22,7 +23,12 @@ async function fetchTextWithFallback(url, headers = {}) {
   };
   const direct = await fetch(url, { headers: merged }).catch(() => null);
   if (direct?.ok) return direct.text();
-  throw new Error(`HTTP ${direct?.status ?? "failed"} fetching ${url}`);
+  const ref = headers.Referer ?? `${BASE}/`;
+  const proxied = await fetch(`${PROXY}?url=${encodeURIComponent(url)}&ref=${encodeURIComponent(ref)}`, {
+    headers: { "User-Agent": UA, Accept: merged.Accept },
+  }).catch(() => null);
+  if (proxied?.ok) return proxied.text();
+  throw new Error(`HTTP ${direct?.status ?? proxied?.status ?? "failed"} fetching ${url}`);
 }
 
 async function fetchAnidbHtml(url, headers = {}) {

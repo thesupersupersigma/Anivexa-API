@@ -70,6 +70,47 @@ Runs on Node.js. No build step needed.
 
 ---
 
+## Deploying on Vercel
+
+The API works on Vercel out of the box. However, **AniDB App** makes direct requests to `anidb.app`, and Vercel's serverless IPs tend to get blocked by it. To fix this, deploy the included proxy worker to Cloudflare Workers and set your proxy URL in `providers/anidbapp.js`.
+
+### 1. Deploy the proxy worker
+
+You need [Node.js](https://nodejs.org) and a free [Cloudflare account](https://cloudflare.com).
+
+```bash
+npm install -g wrangler
+wrangler login
+cd proxy
+wrangler deploy
+```
+
+This deploys a small worker to your Cloudflare account. Copy the URL it gives you (e.g. `https://anidb-proxy.yourname.workers.dev`).
+
+### 2. Set your proxy URL
+
+Open `providers/anidbapp.js` and replace the placeholder:
+
+```js
+const PROXY = "YOUR_PROXY_URL";
+```
+
+with your deployed worker URL:
+
+```js
+const PROXY = "https://anidb-proxy.yourname.workers.dev";
+```
+
+### 3. Deploy to Vercel
+
+```bash
+vercel --prod
+```
+
+The provider will try a direct request to `anidb.app` first. If that gets blocked, it automatically falls back through your proxy worker.
+
+---
+
 ## Contributing
 
 > **Only request providers that self-host their content. No scrapers of third-party sites.**
@@ -93,7 +134,6 @@ When this was last updated, AnimePahe switched from DDoS-Guard to a Cloudflare J
 <div align="center">
 
 hope it helped :3
-and bro it took me a while to make, so thank me later
 
 [![Discord](https://img.shields.io/badge/Join%20the%20community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/zs22ZJttZM)
 

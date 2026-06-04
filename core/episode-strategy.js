@@ -152,7 +152,7 @@ async function withCache(key, status, fetchFn) {
 
 async function safe(label, fn) {
   try   { return { ok: true,  data: await fn() }; }
-  catch (e) { console.error(`[ep:${label}]`, e.message); return { ok: false, error: e.message }; }
+  catch (e) { console.error(`[ep:${label}]`, e.message); return { ok: false, error: e.message, stack: e.stack }; }
 }
 
 export async function buildEpisodesWithCache(anilistId, media, anizip) {
@@ -176,12 +176,12 @@ export async function buildEpisodesWithCache(anilistId, media, anizip) {
   ]);
 
   return {
-    animepahe: pahe.ok    ? pahe.data    : null,
-    allmanga:  manga.ok   ? manga.data   : null,
-    reanime:   reanime.ok ? reanime.data : null,
-    anikoto:   anikoto.ok ? anikoto.data : null,
-    animegg:   animegg.ok ? animegg.data : null,
-    anineko:   anineko.ok ? anineko.data : null,
-    anidbapp:  anidbapp.ok ? anidbapp.data : null,
+    animepahe: pahe.ok    ? pahe.data    : { error: pahe.error,    stack: pahe.stack },
+    allmanga:  manga.ok   ? manga.data   : { error: manga.error,   stack: manga.stack },
+    reanime:   reanime.ok ? reanime.data : { error: reanime.error, stack: reanime.stack },
+    anikoto:   anikoto.ok ? anikoto.data : { error: anikoto.error, stack: anikoto.stack },
+    animegg:   animegg.ok ? animegg.data : { error: animegg.error, stack: animegg.stack },
+    anineko:   anineko.ok ? anineko.data : { error: anineko.error, stack: anineko.stack },
+    anidbapp:  anidbapp.ok ? anidbapp.data : { error: anidbapp.error, stack: anidbapp.stack },
   };
 }
